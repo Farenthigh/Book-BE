@@ -1,14 +1,13 @@
-import { StatusCodes } from "./../enum/statusCode";
-import { cookiesConfig, jwtSecret } from "./../config/auth";
-import { Response } from "express";
-import { Request } from "express";
-import { AppDataSource } from "../data-source";
-import { User } from "./../entity/User";
-import { Repository } from "typeorm";
 import * as bcrypt from "bcrypt";
-import { salt } from "../config/auth";
-import { Cookie } from "../entity/cookie";
+import { Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
+import { Repository } from "typeorm";
+import { salt } from "../config/auth";
+import { AppDataSource } from "../data-source";
+import { Cookie } from "../entity/cookie";
+import { cookiesConfig, jwtSecret } from "./../config/auth";
+import { User } from "./../entity/User";
+import { StatusCodes } from "./../enum/statusCode";
 
 export class auth {
   private userRepository: Repository<User>;
@@ -43,6 +42,8 @@ export class auth {
       const cookie = new Cookie();
       cookie.id = token;
       cookie.user = user;
+      cookie.createdAt = new Date();
+      cookie.expiredAt = new Date(new Date().setDate(new Date().getDate() + 3));
       await this.userRepository.save(user);
       await this.cookieRepository.save(cookie);
       return res
@@ -56,7 +57,7 @@ export class auth {
     }
   };
   me = async (req: Request, res: Response) => {
-    const token = req.cookies.token;
+    const { token } = req.cookies;
     try {
       const response = await this.cookieRepository
         .createQueryBuilder("cookie")
@@ -106,6 +107,8 @@ export class auth {
       const cookie = new Cookie();
       cookie.id = token;
       cookie.user = user;
+      cookie.createdAt = new Date();
+      cookie.expiredAt = new Date(new Date().setDate(new Date().getDate() + 3));
       await this.cookieRepository.delete({
         user: user,
       });
@@ -122,7 +125,7 @@ export class auth {
   };
   logout = async (req: Request, res: Response) => {
     try {
-      const token = req.cookies.token;
+      const { token } = req.cookies;
       await this.cookieRepository.delete(token);
       console.log();
       return res
