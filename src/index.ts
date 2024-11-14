@@ -1,12 +1,20 @@
-import { AppDataSource } from "./data-source";
-import * as express from "express";
 import * as cookieParser from "cookie-parser";
-import userRouter from "./routers/user";
+import * as cors from "cors";
+import * as express from "express";
 import { db_host, port } from "./config/env";
+import { AppDataSource } from "./data-source";
+import userRouter from "./routers/user";
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+const origin = ["http://localhost:5173"];
+app.use(
+  cors({
+    origin: origin,
+    credentials: true,
+  })
+);
 
 app.use("/user", userRouter);
 
