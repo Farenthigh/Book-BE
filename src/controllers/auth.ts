@@ -23,7 +23,14 @@ export class auth {
     if (!email || !password) {
       return res.status(400).json({ message: "กรุณากรอกข้อมูลให้ครบถ้วน" });
     }
-    if ((await this.userRepository.find(email)).length !== 0) {
+    const alluser = await this.userRepository.find();
+    const users = await this.userRepository.find({
+      where: {
+        email: email,
+      },
+    });
+    console.log(alluser);
+    if (!users) {
       return res.status(StatusCodes.conflict).send({
         error: "This email is already use",
       });
@@ -34,7 +41,7 @@ export class auth {
       user.password = await bcrypt.hash(password, salt);
       user.firstname = firstname;
       user.lastname = lastname;
-      user.role = role;
+      user.role = role || "user";
       const payload = {
         id: user.id,
       };
@@ -70,7 +77,11 @@ export class auth {
         .addSelect("user.role")
         .where("cookie.id = :token", { token })
         .getOne();
-      return res.status(StatusCodes.ok).send(response);
+      if (!response)
+        return res
+          .status(StatusCodes.unAuthorized)
+          .send({ message: "Session expire, please login again" });
+      return res.status(StatusCodes.ok).send(response.user);
     } catch (error) {
       return res.status(StatusCodes.serverError).send({
         message: error.message,
@@ -127,7 +138,6 @@ export class auth {
     try {
       const { token } = req.cookies;
       await this.cookieRepository.delete(token);
-      console.log();
       return res
         .status(StatusCodes.ok)
         .clearCookie("token")
