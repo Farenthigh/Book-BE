@@ -14,7 +14,8 @@ import { RentalTransaction } from "./rentaltransaction";
 import { Rent } from "./rent";
 import { Buy } from "./buy";
 import { FavoriteBook } from "./favbook";
-
+import { PhoneNumber } from "./phonenumber";
+import { Address } from "./address";
 @Entity()
 export class User {
   @PrimaryGeneratedColumn("uuid", {
@@ -80,4 +81,15 @@ export class User {
     onDelete: "CASCADE",
   })
   favbooks: FavoriteBook[];
+
+  @OneToMany(() => PhoneNumber, (PhoneNumber) => PhoneNumber.id, {
+    onUpdate: "CASCADE",
+  })
+  phonenumber: PhoneNumber[];
+
+  @OneToMany(() => Address, (Address) => Address.id, {
+    onUpdate: "CASCADE",
+  })
+  address: Address[];
+
 }

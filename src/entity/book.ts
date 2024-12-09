@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -9,6 +10,8 @@ import { bookType } from "../enum/book";
 import { FavoriteBook } from "./favbook";
 import { Rentbook } from "./rentbook";
 import { Salebook } from "./salebook";
+import { Author } from "./author"
+import { Publisher } from "./publisher";
 
 @Entity()
 export class book {
@@ -50,4 +53,15 @@ export class book {
     onDelete: "CASCADE",
   })
   favbook: FavoriteBook[];
+
+  @ManyToOne(() => Author, (Author) => Author.id, {
+    onUpdate: "CASCADE",
+  })
+  author: Author;
+
+  @ManyToOne(() => Publisher, (Publisher) => Publisher.id, {
+    onUpdate: "CASCADE",
+  })
+  publisher: Publisher;
+
 }
