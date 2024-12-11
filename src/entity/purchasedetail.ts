@@ -1,5 +1,6 @@
 import {
   Column,
+  Entity,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -8,8 +9,9 @@ import {
 import { PurchaseTrans } from "./purchasetrans";
 import { Salebook } from "./salebook";
 
+@Entity()
 export class PurchaseDetail {
-  @PrimaryGeneratedColumn("increment")
+  @PrimaryGeneratedColumn("rowid")
   id: number;
 
   @OneToOne(() => PurchaseTrans, (PurchaseTrans) => PurchaseTrans.id, {

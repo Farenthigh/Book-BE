@@ -1,7 +1,7 @@
-import { OneToOne, PrimaryGeneratedColumn, Column } from "typeorm";
+import { OneToOne, PrimaryGeneratedColumn, Column, Entity } from "typeorm";
 import { Rentbook } from "./rentbook";
 import { fineType } from "../enum/fine";
-
+@Entity()
 export class Fine {
   @PrimaryGeneratedColumn("increment")
   id: number;

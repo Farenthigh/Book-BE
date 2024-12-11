@@ -1,4 +1,4 @@
-export enum bookType {
-  sale,
-  rent,
+export enum postType {
+  sale = "sale",
+  rent = "rent",
 }

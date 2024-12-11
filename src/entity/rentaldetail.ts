@@ -1,9 +1,16 @@
 import { returnStatus } from "../enum/returnstatus";
-import { Column, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { RentalTransaction } from "./rentaltransaction";
 import { Rentbook } from "./rentbook";
 import { fineType } from "../enum/fine";
 
+@Entity()
 export class RentalDetail {
   @PrimaryGeneratedColumn()
   id: number;

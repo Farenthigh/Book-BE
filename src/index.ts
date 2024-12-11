@@ -3,6 +3,7 @@ import * as cors from "cors";
 import * as express from "express";
 import { db_host, port } from "./config/env";
 import { AppDataSource } from "./data-source";
+import bookRouter from "./routers/book";
 import userRouter from "./routers/user";
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(
 );
 
 app.use("/user", userRouter);
+app.use("/book", bookRouter);
 
 AppDataSource.initialize()
   .then(async () => {

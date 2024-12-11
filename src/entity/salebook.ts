@@ -21,7 +21,7 @@ export class Salebook {
   @Column({ nullable: false })
   price: number;
 
-  @Column({ nullable: false })
+  @Column({ nullable: false, default: 1 })
   stock_quantity: string;
 
   @Column({ default: "available" })

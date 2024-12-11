@@ -1,6 +1,6 @@
 export enum rentStatus {
-  active,
-  returned,
-  late,
-  cancelled,
+  active = "active",
+  returned = "returned",
+  late = "late",
+  cancelled = "cancelled",
 }

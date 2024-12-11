@@ -22,12 +22,18 @@ export class Rentbook {
   owner: User;
 
   @Column({ nullable: false })
-  price: number;
+  fivedayprice: number;
+
+  @Column({ nullable: false })
+  sevendayprice: number;
+
+  @Column({ nullable: false })
+  fourteendayprice: number;
 
   @Column({ nullable: false })
   stock_quantity: number;
 
-  @Column({ default: "available" })
+  @Column({ default: statustype.available })
   status: statustype;
 
   @Column({ default: () => "CURRENT_TIMESTAMP" })

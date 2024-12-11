@@ -1,6 +1,6 @@
 export enum conditionType {
-  new,
-  likeNew,
-  good,
-  acceptable,
+  new = "new",
+  likeNew = "likeNew",
+  good = "good",
+  acceptable = "acceptable",
 }

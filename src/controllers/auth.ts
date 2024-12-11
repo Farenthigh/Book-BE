@@ -4,7 +4,7 @@ import * as jwt from "jsonwebtoken";
 import { Repository } from "typeorm";
 import { salt } from "../config/auth";
 import { AppDataSource } from "../data-source";
-import { Cookie } from "../entity/cookie";
+import { Cookie } from "../entity/Cookie";
 import { cookiesConfig, jwtSecret } from "./../config/auth";
 import { User } from "./../entity/User";
 import { StatusCodes } from "./../enum/statusCode";
@@ -17,7 +17,6 @@ export class auth {
     this.cookieRepository = AppDataSource.getRepository(Cookie);
   }
 
-  //   register = async (req: Request, res: Response) => {
   register = async (req: Request, res: Response) => {
     const { email, password, firstname, lastname, role } = req.body;
     if (!email || !password) {

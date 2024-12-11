@@ -1,6 +1,6 @@
 export enum shipmentType {
-  pending,
-  shipped,
-  delivered,
-  cancelled,
+  pending = "pending",
+  shipped = "shipped",
+  delivered = "delivered",
+  cancelled = "cancelled",
 }

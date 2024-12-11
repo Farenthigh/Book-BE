@@ -1,21 +1,20 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
   Column,
-  OneToMany,
-  OneToOne,
+  Entity,
   ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
 } from "typeorm";
-import { Cookie } from "./cookie";
-import { Salebook } from "./salebook";
-import { Rentbook } from "./rentbook";
-import { PurchaseTrans } from "./purchasetrans";
-import { RentalTransaction } from "./rentaltransaction";
-import { Rent } from "./rent";
+import { Address } from "./address";
 import { Buy } from "./buy";
+import { Cookie } from "./Cookie";
 import { FavoriteBook } from "./favbook";
 import { PhoneNumber } from "./phonenumber";
-import { Address } from "./address";
+import { PurchaseTrans } from "./purchasetrans";
+import { Rent } from "./rent";
+import { RentalTransaction } from "./rentaltransaction";
+import { Rentbook } from "./rentbook";
+import { Salebook } from "./salebook";
 @Entity()
 export class User {
   @PrimaryGeneratedColumn("uuid", {
@@ -35,7 +34,7 @@ export class User {
   @Column()
   password: string;
 
-  @Column()
+  @Column({ default: "user" })
   role: string;
 
   @OneToMany(() => Cookie, (Cookie) => Cookie.id, {
@@ -91,5 +90,4 @@ export class User {
     onUpdate: "CASCADE",
   })
   address: Address[];
-
 }

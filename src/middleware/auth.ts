@@ -1,10 +1,10 @@
-import { Request, Response, NextFunction } from "express";
-import { AppDataSource } from "../data-source";
-import { Repository } from "typeorm";
+import { NextFunction, Request, Response } from "express";
 import * as jwt from "jsonwebtoken";
-import { User } from "../entity/User";
+import { Repository } from "typeorm";
 import { ROLE_TYPE, USER_ID } from "../config/constance";
-import { Cookie } from "../entity/cookie";
+import { AppDataSource } from "../data-source";
+import { Cookie } from "../entity/Cookie";
+import { User } from "../entity/User";
 import { StatusCodes } from "../enum/statusCode";
 
 export class middleware {

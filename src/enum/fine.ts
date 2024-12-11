@@ -1,4 +1,4 @@
 export enum fineType {
-  unpaid,
-  paid,
+  unpaid = "unpaid",
+  paid = "paid",
 }

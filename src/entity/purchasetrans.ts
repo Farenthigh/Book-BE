@@ -1,7 +1,8 @@
-import { Column, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { shipmentType } from "../enum/shipment";
 import { User } from "./User";
 
+@Entity()
 export class PurchaseTrans {
   @PrimaryGeneratedColumn("increment")
   id: number;

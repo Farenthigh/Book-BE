@@ -1,5 +1,5 @@
 export enum returnStatus {
-  returned,
-  partial,
-  notreturned,
+  returned = "returned",
+  partial = "partial",
+  notreturned = "notreturned",
 }

@@ -1,17 +1,18 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { bookType } from "../enum/book";
+import { postType } from "../enum/book";
+import { Author } from "./author";
 import { FavoriteBook } from "./favbook";
+import { Publisher } from "./publisher";
 import { Rentbook } from "./rentbook";
 import { Salebook } from "./salebook";
-import { Author } from "./author"
-import { Publisher } from "./publisher";
 
 @Entity()
 export class book {
@@ -19,19 +20,22 @@ export class book {
   id: number;
 
   @Column()
-  type: bookType;
+  type: postType;
 
   @Column({ nullable: false })
   title: string;
 
   @Column({ nullable: false })
-  author_id: string;
+  description: string;
 
-  @Column({ nullable: false })
-  publisher_id: string;
+  @Column()
+  category: string;
 
-  @Column({ nullable: false })
-  category_id: string;
+  @Column()
+  phoneNumber: string;
+
+  @Column()
+  lineID: string;
 
   @Column({ default: () => "CURRENT_TIMESTAMP" })
   created_at: Date;
@@ -42,11 +46,13 @@ export class book {
   @OneToOne(() => Salebook, (Salebook) => Salebook.id, {
     onDelete: "CASCADE",
   })
+  @JoinColumn()
   salebook: Salebook;
 
   @OneToOne(() => Rentbook, (Rentbook) => Rentbook.id, {
     onDelete: "CASCADE",
   })
+  @JoinColumn()
   rentbook: Rentbook;
 
   @OneToMany(() => FavoriteBook, (FavoriteBook) => FavoriteBook.book, {
@@ -63,5 +69,4 @@ export class book {
     onUpdate: "CASCADE",
   })
   publisher: Publisher;
-
 }

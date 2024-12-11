@@ -12,7 +12,7 @@ export const AppDataSource = new DataSource({
   // on Prooduction, Turn this off
   synchronize: true,
   logging: false,
-  entities: ["src/entity/**/*.ts"],
+  entities: ["src/entity/*.ts"],
   // on Production, create migration when database change like column
   migrations: [],
   subscribers: [],
