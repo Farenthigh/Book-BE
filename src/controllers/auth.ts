@@ -28,7 +28,6 @@ export class auth {
         email: email,
       },
     });
-    console.log(alluser);
     if (!users) {
       return res.status(StatusCodes.conflict).send({
         error: "This email is already use",
