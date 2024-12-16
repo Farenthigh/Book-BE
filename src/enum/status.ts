@@ -1,5 +1,5 @@
 export enum statustype {
   available = "available",
-  unavailable = "unavailable",
+  Rented = "Rented",
   soldout = "soldout",
 }

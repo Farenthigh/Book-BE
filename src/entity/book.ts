@@ -28,7 +28,7 @@ export class book {
   @Column({ nullable: false })
   description: string;
 
-  @Column()
+  @Column({ nullable: false })
   category: string;
 
   @Column()

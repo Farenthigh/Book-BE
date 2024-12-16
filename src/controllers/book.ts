@@ -4,6 +4,7 @@ import { AppDataSource } from "../data-source";
 import { book } from "./../entity/book";
 import { condition } from "./../entity/condition";
 import { postType } from "./../enum/book";
+import { statustype } from "./../enum/status";
 
 import { USER_ID } from "../config/constance";
 import { Publisher } from "../entity/publisher";
@@ -41,7 +42,7 @@ export class BookController {
         .leftJoinAndSelect("salebook.condition", "condition")
         .where("salebook.seller = :id", { id: req[USER_ID] })
         .orWhere("rentbook.owner = :id", { id: req[USER_ID] })
-        .getMany();
+        .getRawMany();
       return res.send(myBook).status(StatusCodes.ok);
     } catch (error) {
       return res.status(500).send({ message: error.message });
@@ -94,6 +95,7 @@ export class BookController {
       newBook.lineID = lineID;
       newBook.type = type;
       if (type === postType.sale) {
+        console.log("sale");
         const owner = await this.UserRepository.findOne({
           where: { id: req[USER_ID] },
         });
@@ -106,6 +108,7 @@ export class BookController {
         newSaleBook.price = price;
         newSaleBook.stock_quantity = stock_quantity;
         newSaleBook.seller = owner;
+        newSaleBook.book = newBook;
         newBook.salebook = newSaleBook;
         this.SaleBookRepository.save(newSaleBook);
         this.BookRepository.save(newBook);
@@ -121,6 +124,7 @@ export class BookController {
         newRentBook.fourteendayprice = fourteendayprice;
         newRentBook.stock_quantity = stock_quantity;
         newRentBook.owner = owner;
+        newRentBook.status = statustype.available;
         newRentBook.book = newBook;
         newBook.rentbook = newRentBook;
         this.RentBookRepository.save(newRentBook);
@@ -136,9 +140,12 @@ export class BookController {
   };
   getRentBook = async (req: Request, res: Response) => {
     try {
-      const rentBooks = await this.BookRepository.find({
-        where: { type: postType.rent },
-      });
+      const rentBooks = await this.BookRepository.createQueryBuilder("book")
+        .leftJoinAndSelect("book.rentbook", "rentbook")
+        .leftJoinAndSelect("book.author", "author")
+        .leftJoinAndSelect("book.publisher", "publisher")
+        .where("book.type = :type", { type: postType.rent })
+        .getRawMany();
       return res.send(rentBooks).status(StatusCodes.ok);
     } catch (error) {
       return res.status(500).send({ message: error.message });
@@ -146,9 +153,12 @@ export class BookController {
   };
   getSaleBook = async (req: Request, res: Response) => {
     try {
-      const saleBooks = await this.BookRepository.find({
-        where: { type: postType.sale },
-      });
+      const saleBooks = await this.BookRepository.createQueryBuilder("book")
+        .leftJoinAndSelect("book.salebook", "salebook")
+        .leftJoinAndSelect("book.author", "author")
+        .leftJoinAndSelect("book.publisher", "publisher")
+        .where("book.type = :type", { type: postType.sale })
+        .getRawMany();
       return res.send(saleBooks).status(StatusCodes.ok);
     } catch (error) {
       return res.status(500).send({ message: error.message });
