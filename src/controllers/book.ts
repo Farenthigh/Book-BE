@@ -157,6 +157,7 @@ export class BookController {
         .leftJoinAndSelect("book.salebook", "salebook")
         .leftJoinAndSelect("book.author", "author")
         .leftJoinAndSelect("book.publisher", "publisher")
+        .leftJoinAndSelect("salebook.condition", "condition")
         .where("book.type = :type", { type: postType.sale })
         .getRawMany();
       return res.send(saleBooks).status(StatusCodes.ok);
@@ -167,9 +168,14 @@ export class BookController {
   findBook = async (req: Request, res: Response) => {
     try {
       const id = req.params.id;
-      const book = await this.BookRepository.findOne({
-        where: { id: id },
-      });
+      const book = await this.BookRepository.createQueryBuilder("book")
+        .leftJoinAndSelect("book.rentbook", "rentbook")
+        .leftJoinAndSelect("book.salebook", "salebook")
+        .leftJoinAndSelect("book.author", "author")
+        .leftJoinAndSelect("book.publisher", "publisher")
+        .leftJoinAndSelect("salebook.condition", "condition")
+        .where("book.id = :id", { id })
+        .getRawMany();
       return res.send(book).status(StatusCodes.ok);
     } catch (error) {
       return res.status(500).send({ message: error.message });
@@ -192,8 +198,10 @@ export class BookController {
       category,
       description,
       type,
+      status,
       Condition,
       price,
+
       fivedayprice,
       sevendayprice,
       fourteendayprice,
@@ -236,6 +244,7 @@ export class BookController {
         this.BookRepository.save(book);
         return res.send({ message: "Book updated successfully", book });
       }
+      book.rentbook.status = status;
       book.rentbook.fivedayprice = fivedayprice;
       book.rentbook.sevendayprice = sevendayprice;
       book.rentbook.fourteendayprice = fourteendayprice;
