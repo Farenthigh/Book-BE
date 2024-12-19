@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import { BookController } from "./../controllers/book";
 import { favoritecontroller } from "./../controllers/favorite";
 
+import { cartcontroller } from "../controllers/cart";
 import { middleware } from "../middleware/auth";
 
 const router = Router();
@@ -9,6 +10,7 @@ const router = Router();
 const bookController = new BookController();
 const MiddlewareController = new middleware();
 const Favoritecontroller = new favoritecontroller();
+const Cartcontroller = new cartcontroller();
 
 router.get("/", (req: Request, res: Response) => {
   res.send("Hello from user route");
@@ -60,6 +62,13 @@ router.put(
   "/updatebook/:id",
   MiddlewareController.isExist,
   bookController.updateBook
+);
+router.post("/addcart", MiddlewareController.isExist, Cartcontroller.addCart);
+router.get("/getcart", MiddlewareController.isExist, Cartcontroller.getCart);
+router.delete(
+  "/deletecart/:id",
+  MiddlewareController.isExist,
+  Cartcontroller.deleteCart
 );
 // router.get(
 //   "/getfavoriterent",

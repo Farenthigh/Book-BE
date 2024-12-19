@@ -283,12 +283,26 @@ export class BookController {
   deleteBook = async (req: Request, res: Response) => {
     try {
       const id = req.params.id;
-      await this.BookRepository.delete({ id: id });
-      return res.send({ message: "Book deleted successfully" });
+      await this.BookImageRepository.delete({ Book: { id } });
+      await this.BookRepository.delete({ id });
+      return res
+        .send({ message: "Book deleted successfully" })
+        .status(StatusCodes.ok);
     } catch (error) {
       return res.status(500).send({ message: error.message });
     }
   };
+
+  // deleteFavorite = async (req: Request, res: Response) => {
+  //   const { bookid } = req.body;
+  //   const userid = req[USER_ID];
+  //   try {
+  //     await this.FavoriteModel.deleteOne({ bookId: bookid, userId: userid });
+  //     return res.status(200).send({ message: "Delete favorite successfully" });
+  //   } catch (error) {
+  //     return res.status(500).send({ message: error.message });
+  //   }
+  // };
   updateBook = async (req: Request, res: Response) => {
     const {
       title,
