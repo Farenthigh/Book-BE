@@ -9,6 +9,7 @@ import {
 } from "typeorm";
 import { postType } from "../enum/book";
 import { Author } from "./author";
+import { BookImage } from "./bookimage";
 import { FavoriteBook } from "./favbook";
 import { Publisher } from "./publisher";
 import { Rentbook } from "./rentbook";
@@ -69,4 +70,7 @@ export class book {
     onUpdate: "CASCADE",
   })
   publisher: Publisher;
+
+  @OneToMany(() => BookImage, (BookImage) => BookImage.image)
+  BookImage: BookImage[];
 }

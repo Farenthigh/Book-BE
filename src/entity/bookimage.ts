@@ -1,16 +1,16 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { book } from "./book";
 
 @Entity()
 export class BookImage {
   @PrimaryGeneratedColumn("increment")
   id: number;
-
-  @ManyToOne(() => book, (book) => book.id, {
-    onDelete: "CASCADE",
-    onUpdate: "CASCADE",
-  })
-  book: book;
 
   @Column({ nullable: false })
   image: string;
@@ -20,4 +20,9 @@ export class BookImage {
 
   @Column({ default: () => "CURRENT_TIMESTAMP", onUpdate: "CURRENT_TIMESTAMP" })
   updated_at: Date;
+
+  @ManyToOne(() => book, (book) => book.BookImage, {
+    onUpdate: "CASCADE",
+  })
+  Book: book;
 }

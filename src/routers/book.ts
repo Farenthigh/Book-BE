@@ -61,5 +61,15 @@ router.put(
   MiddlewareController.isExist,
   bookController.updateBook
 );
+// router.get(
+//   "/getfavoriterent",
+//   MiddlewareController.isExist,
+//   Favoritecontroller.getFavoriteRent
+// );
+// router.get(
+//   "/getfavoritesale",
+//   MiddlewareController.isExist,
+//   Favoritecontroller.getFavoriteSale
+// );
 
 export default router;

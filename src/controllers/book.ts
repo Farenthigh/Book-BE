@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Repository } from "typeorm";
 import { AppDataSource } from "../data-source";
 import { book } from "./../entity/book";
+import { BookImage } from "./../entity/bookimage";
 import { condition } from "./../entity/condition";
 import { postType } from "./../enum/book";
 import { statustype } from "./../enum/status";
@@ -21,6 +22,7 @@ export class BookController {
   private AuthorRepository: Repository<Author>;
   private PublisherRepository: Repository<Publisher>;
   private conditionRepository: Repository<condition>;
+  private BookImageRepository: Repository<BookImage>;
   private UserRepository: Repository<any>;
 
   constructor() {
@@ -30,6 +32,7 @@ export class BookController {
     this.AuthorRepository = AppDataSource.getRepository(Author);
     this.PublisherRepository = AppDataSource.getRepository(Publisher);
     this.conditionRepository = AppDataSource.getRepository(condition);
+    this.BookImageRepository = AppDataSource.getRepository(BookImage);
     this.UserRepository = AppDataSource.getRepository(User);
   }
   getAllBook = async (req: Request, res: Response) => {
@@ -43,6 +46,26 @@ export class BookController {
         .where("salebook.seller = :id", { id: req[USER_ID] })
         .orWhere("rentbook.owner = :id", { id: req[USER_ID] })
         .getRawMany();
+      const image = await this.BookImageRepository.createQueryBuilder(
+        "BookImage"
+      )
+        .leftJoinAndSelect("BookImage.Book", "Book")
+        .getRawMany();
+      const images = image.map((img) => {
+        return {
+          image: img.BookImage_image,
+          book: img.Book_id,
+        };
+      });
+      const result = myBook.map((book) => {
+        const img = images.filter((image) => {
+          return image.book === book.book_id;
+        });
+        return {
+          ...book,
+          image: img,
+        };
+      });
       return res.send(myBook).status(StatusCodes.ok);
     } catch (error) {
       return res.status(500).send({ message: error.message });
@@ -58,6 +81,7 @@ export class BookController {
       description,
       type,
       Condition,
+      bookimage,
       price,
       stock_quantity,
       fivedayprice,
@@ -81,10 +105,11 @@ export class BookController {
     try {
       const newAuthor = new Author();
       newAuthor.name = author;
-      this.AuthorRepository.save(newAuthor);
+      await this.AuthorRepository.save(newAuthor);
       const newPublisher = new Publisher();
       newPublisher.name = publisher;
-      this.PublisherRepository.save(newPublisher);
+      await this.PublisherRepository.save(newPublisher);
+      newPublisher.name = publisher;
       const newBook = new book();
       newBook.title = title;
       newBook.author = newAuthor;
@@ -95,14 +120,13 @@ export class BookController {
       newBook.lineID = lineID;
       newBook.type = type;
       if (type === postType.sale) {
-        console.log("sale");
         const owner = await this.UserRepository.findOne({
           where: { id: req[USER_ID] },
         });
         const newCondition = new condition();
         newCondition.level = Condition;
         newCondition.description = Condition;
-        this.conditionRepository.save(newCondition);
+        await this.conditionRepository.save(newCondition);
         const newSaleBook = new Salebook();
         newSaleBook.condition = newCondition;
         newSaleBook.price = price;
@@ -110,8 +134,16 @@ export class BookController {
         newSaleBook.seller = owner;
         newSaleBook.book = newBook;
         newBook.salebook = newSaleBook;
-        this.SaleBookRepository.save(newSaleBook);
-        this.BookRepository.save(newBook);
+        await this.SaleBookRepository.save(newSaleBook);
+        await this.BookRepository.save(newBook);
+        const images = bookimage.map((image: string) => {
+          const newBookImage = new BookImage();
+          newBookImage.image = image;
+          newBookImage.Book = newBook;
+          return newBookImage;
+        });
+        await this.BookImageRepository.save(images);
+
         return res.send({ message: "Book added successfully" });
       }
       if (type === postType.rent) {
@@ -127,8 +159,15 @@ export class BookController {
         newRentBook.status = statustype.available;
         newRentBook.book = newBook;
         newBook.rentbook = newRentBook;
-        this.RentBookRepository.save(newRentBook);
-        this.BookRepository.save(newBook);
+        await this.RentBookRepository.save(newRentBook);
+        await this.BookRepository.save(newBook);
+        const images = bookimage.map((image: string) => {
+          const newBookImage = new BookImage();
+          newBookImage.image = image;
+          newBookImage.Book = newBook;
+          return newBookImage;
+        });
+        await this.BookImageRepository.save(images);
 
         // this.RentBookRepository.save(newRentBook);
         // this.BookRepository.save(newBook);
@@ -146,21 +185,60 @@ export class BookController {
         .leftJoinAndSelect("book.publisher", "publisher")
         .where("book.type = :type", { type: postType.rent })
         .getRawMany();
-      return res.send(rentBooks).status(StatusCodes.ok);
+      const image = await this.BookImageRepository.createQueryBuilder(
+        "BookImage"
+      )
+        .leftJoinAndSelect("BookImage.Book", "Book")
+        .getRawMany();
+      const images = image.map((img) => {
+        return {
+          image: img.BookImage_image,
+          book: img.Book_id,
+        };
+      });
+      const result = rentBooks.map((book) => {
+        const img = images.filter((image) => {
+          return image.book === book.book_id;
+        });
+        return {
+          ...book,
+          image: img,
+        };
+      });
+      return res.send(result).status(StatusCodes.ok);
     } catch (error) {
       return res.status(500).send({ message: error.message });
     }
   };
   getSaleBook = async (req: Request, res: Response) => {
     try {
-      const saleBooks = await this.BookRepository.createQueryBuilder("book")
+      const salebooks = await this.BookRepository.createQueryBuilder("book")
         .leftJoinAndSelect("book.salebook", "salebook")
         .leftJoinAndSelect("book.author", "author")
         .leftJoinAndSelect("book.publisher", "publisher")
-        .leftJoinAndSelect("salebook.condition", "condition")
         .where("book.type = :type", { type: postType.sale })
         .getRawMany();
-      return res.send(saleBooks).status(StatusCodes.ok);
+      const image = await this.BookImageRepository.createQueryBuilder(
+        "BookImage"
+      )
+        .leftJoinAndSelect("BookImage.Book", "Book")
+        .getRawMany();
+      const images = image.map((img) => {
+        return {
+          image: img.BookImage_image,
+          book: img.Book_id,
+        };
+      });
+      const result = salebooks.map((book) => {
+        const img = images.filter((image) => {
+          return image.book === book.book_id;
+        });
+        return {
+          ...book,
+          image: img,
+        };
+      });
+      return res.send(result).status(StatusCodes.ok);
     } catch (error) {
       return res.status(500).send({ message: error.message });
     }
@@ -176,7 +254,28 @@ export class BookController {
         .leftJoinAndSelect("salebook.condition", "condition")
         .where("book.id = :id", { id })
         .getRawMany();
-      return res.send(book).status(StatusCodes.ok);
+      const image = await this.BookImageRepository.createQueryBuilder(
+        "BookImage"
+      )
+        .leftJoinAndSelect("BookImage.Book", "Book")
+        .getRawMany();
+      const images = image.map((img) => {
+        return {
+          image: img.BookImage_image,
+          book: img.Book_id,
+        };
+      });
+      const result = book.map((book) => {
+        const img = images.filter((image) => {
+          return image.book === book.book_id;
+        });
+        return {
+          ...book,
+          image: img,
+        };
+      });
+
+      return res.send(result).status(StatusCodes.ok);
     } catch (error) {
       return res.status(500).send({ message: error.message });
     }
@@ -201,7 +300,7 @@ export class BookController {
       status,
       Condition,
       price,
-
+      bookimage,
       fivedayprice,
       sevendayprice,
       fourteendayprice,
@@ -215,6 +314,7 @@ export class BookController {
       !publisher ||
       !category ||
       !description ||
+      !bookimage ||
       !type ||
       !phoneNumber ||
       !lineID
@@ -242,15 +342,35 @@ export class BookController {
         book.salebook.price = price;
         this.SaleBookRepository.save(book.salebook);
         this.BookRepository.save(book);
+        await this.BookRepository.save(book);
+        await this.BookImageRepository.delete({ Book: book });
+        await this.SaleBookRepository.save(book.salebook);
+        const images = bookimage.map((image: string) => {
+          const newBookImage = new BookImage();
+          newBookImage.image = image;
+          newBookImage.Book = book;
+          return newBookImage;
+        });
+        await this.BookImageRepository.save(images);
+
+        return res.send({ message: "Book updated successfully", book });
+      } else if (type === postType.rent) {
+        book.rentbook.status = status;
+        book.rentbook.fivedayprice = fivedayprice;
+        book.rentbook.sevendayprice = sevendayprice;
+        book.rentbook.fourteendayprice = fourteendayprice;
+        this.RentBookRepository.save(book.rentbook);
+        this.BookRepository.save(book);
+        await this.BookImageRepository.delete({ Book: book });
+        const images = bookimage.map((image: string) => {
+          const newBookImage = new BookImage();
+          newBookImage.image = image;
+          newBookImage.Book = book;
+          return newBookImage;
+        });
+        await this.BookImageRepository.save(images);
         return res.send({ message: "Book updated successfully", book });
       }
-      book.rentbook.status = status;
-      book.rentbook.fivedayprice = fivedayprice;
-      book.rentbook.sevendayprice = sevendayprice;
-      book.rentbook.fourteendayprice = fourteendayprice;
-      this.RentBookRepository.save(book.rentbook);
-      this.BookRepository.save(book);
-      return res.send({ message: "Book updated successfully", book });
     } catch (error) {
       return res.status(500).send({ message: error.message });
     }

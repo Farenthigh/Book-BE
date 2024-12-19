@@ -1,17 +1,10 @@
-import {
-  Column,
-  Entity,
-  OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
-  Transaction,
-} from "typeorm";
+import { Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { PurchaseTrans } from "./purchasetrans";
 import { Salebook } from "./salebook";
 
 @Entity()
 export class PurchaseDetail {
-  @PrimaryGeneratedColumn("rowid")
+  @PrimaryGeneratedColumn("increment")
   id: number;
 
   @OneToOne(() => PurchaseTrans, (PurchaseTrans) => PurchaseTrans.id, {
